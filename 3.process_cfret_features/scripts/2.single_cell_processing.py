@@ -22,14 +22,14 @@ from pycytominer import annotate, normalize, feature_select
 
 
 # Path to dir with cleaned data from single-cell QC
-converted_dir = pathlib.Path("./data/converted_profiles")
+converted_dir = pathlib.Path("./data/cleaned_profiles") # for plate 4
 
 # output path for single-cell profiles 
 output_dir = pathlib.Path("./data/single_cell_profiles")
 output_dir.mkdir(parents=True, exist_ok=True)  
 
 # Extract the plate names from the file name
-plate_names = [file.stem.replace("_converted", "") for file in converted_dir.glob("*.parquet")]
+plate_names = [file.stem.replace("_cleaned", "") for file in converted_dir.glob("*.parquet")]
 
 # path for platemap directory
 platemap_dir = pathlib.Path("../metadata/")
@@ -39,6 +39,7 @@ feature_select_ops = [
     "variance_threshold",
     "correlation_threshold",
     "blocklist",
+    "drop_na_columns"
 ]
 
 
@@ -51,7 +52,7 @@ feature_select_ops = [
 plate_info_dictionary = {
     name: {
         "profile_path": str(
-            pathlib.Path(list(converted_dir.rglob(f"{name}_converted.parquet"))[0]).resolve(
+            pathlib.Path(list(converted_dir.rglob(f"{name}_cleaned.parquet"))[0]).resolve(
                 strict=True
             )
         ),
@@ -61,7 +62,7 @@ plate_info_dictionary = {
             )
         ),
     }
-    for name in plate_names
+    for name in plate_names if name == 'localhost231120090001'
 }
 
 # view the dictionary to assess that all info is added correctly
@@ -82,6 +83,7 @@ for plate, info in plate_info_dictionary.items():
     profile_df = pd.read_parquet(info["profile_path"])
     platemap_df = pd.read_csv(info["platemap_path"])
 
+    print("Performing annotation for", plate, "...")
     # Step 1: Annotation
     annotate(
         profiles=profile_df,
@@ -111,6 +113,8 @@ for plate, info in plate_info_dictionary.items():
     if plate == "localhost231120090001":
         samples = "Metadata_heart_number == 7 and Metadata_treatment == 'DMSO'"
 
+    print(f"Performing normalization for", plate, "using this samples parameter:", samples)
+
     # Step 2: Normalization
     normalized_df = normalize(
         profiles=output_annotated_file,
@@ -120,11 +124,12 @@ for plate, info in plate_info_dictionary.items():
         samples=samples,
     )
     
-
+    print("Performing feature selection for", plate, "...")
     # Step 3: Feature selection
     feature_select(
         output_normalized_file,
         operation=feature_select_ops,
+        na_cutoff=0,
         output_file=output_feature_select_file,
         output_type="parquet"
     )

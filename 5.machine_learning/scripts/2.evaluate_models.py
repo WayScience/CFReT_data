@@ -138,13 +138,19 @@ sns.lineplot(
     data=filtered_df,
 )
 
-# plt.legend(loc="lower right", title="Model (data split)")
+plt.legend(loc="lower right", fontsize=15)
 plt.ylim(bottom=0.0, top=1.02)
-plt.xlabel("Recall")
-plt.ylabel("Precision")
-plt.title("Precision vs. Recall Plate 4 Cell Type Classification")
-plt.tight_layout()
+plt.xlabel("Recall", fontsize=18)
+plt.ylabel("Precision", fontsize=18)
+plt.title("Precision vs. Recall Plate 4 Cell Type Classification", fontsize=18)
 
+# Adjust x-axis ticks font size
+plt.xticks(fontsize=14)
+
+# Adjust y-axis ticks font size and labels
+plt.yticks(fontsize=14)
+
+plt.tight_layout()
 plt.savefig(f"{fig_dir}/precision_recall_plate4_downsample.png", dpi=500)
 
 plt.show()
@@ -174,13 +180,19 @@ sns.lineplot(
     data=filtered_df,
 )
 
-# plt.legend(loc="lower right", title="Model (data split)")
+plt.legend(loc="lower right", fontsize=13)
 plt.ylim(bottom=0.0, top=1.02)
-plt.xlabel("Recall")
-plt.ylabel("Precision")
-plt.title("Precision vs. Recall Plate 4 Cell Type Classification")
-plt.tight_layout()
+plt.xlabel("Recall", fontsize=18)
+plt.ylabel("Precision", fontsize=18)
+plt.title("Precision vs. Recall Plate 4 Cell Type Classification", fontsize=18)
 
+# Adjust x-axis ticks font size
+plt.xticks(fontsize=14)
+
+# Adjust y-axis ticks font size and labels
+plt.yticks(fontsize=14)
+
+plt.tight_layout()
 plt.savefig(f"{fig_dir}/precision_recall_plate4_holdout_data_downsample.png", dpi=500)
 
 plt.show()

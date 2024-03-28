@@ -77,14 +77,14 @@ Groups:[module_num:4|svn_version:'Unknown'|variable_revision_number:2|show_windo
     grouping metadata count:1
     Metadata category:Plate
 
-MeasureImageQuality:[module_num:5|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:['Only calculate the saturation metrics as the PercentMaximal metric is currently the only QC needed as blur does not seem to be a factor.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+MeasureImageQuality:[module_num:5|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:['Only calculate the saturation and blur metrics as the PowerLogLogSlope and PercentMaximal metric is currently the only QC needed.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
     Calculate metrics for which images?:All loaded images
     Image count:1
     Scale count:1
     Threshold count:1
     Select the images to measure:
     Include the image rescaling value?:No
-    Calculate blur metrics?:No
+    Calculate blur metrics?:Yes
     Spatial scale for blur measurements:20
     Calculate saturation metrics?:Yes
     Calculate intensity metrics?:No
@@ -96,9 +96,9 @@ MeasureImageQuality:[module_num:5|svn_version:'Unknown'|variable_revision_number
     Minimize the weighted variance or the entropy?:Weighted variance
     Assign pixels in the middle intensity class to the foreground or the background?:Foreground
 
-FlagImage:[module_num:6|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['We will only be flagging images from the DNA and PM channels as those are what most impact the segmentation.', '', 'DNA -> contains large artifacts/smudges', 'PM -> large overlapping cells have highest saturation measured which can be seen in Actin channel']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+FlagImage:[module_num:6|svn_version:'Unknown'|variable_revision_number:5|show_window:False|notes:['We will only be flagging images from the DNA and PM channels as those are what most impact the segmentation.', '', 'DNA -> contains large artifacts/smudges', 'PM -> large overlapping cells have highest saturation measured which can be seen in Actin channel', 'Both -> best at detecting blur across all channels']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
     Hidden:1
-    Hidden:2
+    Hidden:4
     Name the flag's category:Saturation_QC
     Name the flag:Saturation_Flag
     How should measurements be linked?:Flag if any fail
@@ -109,7 +109,7 @@ FlagImage:[module_num:6|svn_version:'Unknown'|variable_revision_number:5|show_wi
     Flag images based on low values?:No
     Minimum value:0.0
     Flag images based on high values?:Yes
-    Maximum value:0.28
+    Maximum value:0.26
     Rules file location:Elsewhere...|
     Rules file name:rules.txt
     Class number:
@@ -120,7 +120,29 @@ FlagImage:[module_num:6|svn_version:'Unknown'|variable_revision_number:5|show_wi
     Flag images based on low values?:No
     Minimum value:0.0
     Flag images based on high values?:Yes
-    Maximum value:0.28
+    Maximum value:0.26
+    Rules file location:Elsewhere...|
+    Rules file name:rules.txt
+    Class number:
+    Allow fuzzy feature matching?:No
+    Flag is based on:Whole-image measurement
+    Select the object to be used for flagging:None
+    Which measurement?:ImageQuality_PowerLogLogSlope_OrigDNA
+    Flag images based on low values?:Yes
+    Minimum value:-2.38
+    Flag images based on high values?:Yes
+    Maximum value:-1.28
+    Rules file location:Elsewhere...|
+    Rules file name:rules.txt
+    Class number:
+    Allow fuzzy feature matching?:No
+    Flag is based on:Whole-image measurement
+    Select the object to be used for flagging:None
+    Which measurement?:ImageQuality_PowerLogLogSlope_OrigPM
+    Flag images based on low values?:Yes
+    Minimum value:-2.38
+    Flag images based on high values?:Yes
+    Maximum value:-1.28
     Rules file location:Elsewhere...|
     Rules file name:rules.txt
     Class number:

@@ -20,8 +20,12 @@ import pandas as pd
 # In[2]:
 
 
-# Path to ata dir
+# Path to data dir
 data_dir = pathlib.Path("./data/")
+
+# Output dir for coefficients
+coeff_dir = pathlib.Path("./coeff_data/")
+coeff_dir.mkdir(exist_ok=True)
 
 # path to training data to access the feature columns
 path_to_training_data = pathlib.Path(f"{data_dir}/training_data.csv")
@@ -92,10 +96,10 @@ positive_coeffs_df.columns = ['Feature', 'Healthy_Coeffs']
 negative_coeffs_df.columns = ['Feature', 'Failing_Coeffs']
 zero_coeffs_df.columns = ['Feature', 'Zero_Coeffs']
 
-# Save the coef data into the "/data" folder
-positive_coeffs_df.to_csv(f'{data_dir}/healthy_coeffs.csv', index=False)
-negative_coeffs_df.to_csv(f'{data_dir}/failing_coeffs.csv', index=False)
-zero_coeffs_df.to_csv(f'{data_dir}/zero_coeffs.csv', index=False)
+# Save the coef data into the "/coeff_data" folder
+positive_coeffs_df.to_csv(f'{coeff_dir}/healthy_coeffs.csv', index=False)
+negative_coeffs_df.to_csv(f'{coeff_dir}/failing_coeffs.csv', index=False)
+zero_coeffs_df.to_csv(f'{coeff_dir}/zero_coeffs.csv', index=False)
 
 
 # Print or use the resulting DataFrames
@@ -171,7 +175,7 @@ coefficients_df = coefficients_df.sort_values(by='Coefficient', ascending=False)
 coefficients_df['Rank'] = range(1, len(coefficients_df) + 1)
 
 # Save the ranked df
-coefficients_df.to_csv(f'{data_dir}/ranked_coeffs.csv', index=False)
+coefficients_df.to_csv(f'{coeff_dir}/ranked_coeffs.csv', index=False)
 
 # Show df to assess if the ranking was performed correctly
 print(coefficients_df.shape)

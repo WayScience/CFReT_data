@@ -56,7 +56,7 @@ qc_df.head()
 channels = ["Actin", "DNA", "ER", "PM", "Mito"]
 
 # Create DataFrames for each channel with all Metadata columns
-Actin_df = qc_df.filter(like="Metadata_").copy()
+Actin_df = qc_df.filter(like="Metadata_").drop(columns=["Metadata_Series", "Metadata_Frame"]).copy()
 DNA_df = Actin_df.copy()
 ER_df = Actin_df.copy()
 PM_df = Actin_df.copy()
@@ -94,7 +94,7 @@ df.head()
 
 # ## Visualize blur metric
 # 
-# Based on the plot below, we can see there is no obvious evidence that blur is impacting the quality of the images. **We will not be filtering out image sets based on this.** Currently based on previous projects, the threshold is anything above -1.5 (meaning the values closer to 0 are more blurry).
+# Based on the plot below, we can see the `actin` channel distribution is more different than the rest of the channels. We found that this difference is due to this channel on average being more dim, but not blurry. We decided that the DNA and PM channels were best at identifying blurry images and minimized removing good quality images. **We used the z-scoring method to identify max and min thresholds using 2 standard deviations.**
 
 # In[4]:
 
@@ -110,6 +110,69 @@ plt.savefig(pathlib.Path(f"{figure_dir}/{plate}_channels_blur_density.png"), dpi
 plt.show()
 
 
+# In[5]:
+
+
+summary_statistics = df["ImageQuality_PowerLogLogSlope"].describe()
+print(summary_statistics)
+
+
+# In[6]:
+
+
+# Calculate Z-scores for the column
+z_scores = zscore(df['ImageQuality_PowerLogLogSlope'])
+
+# Set a threshold for Z-scores (adjust as needed for number of standard deviations away from the mean)
+threshold_z = 2
+
+# Identify outlier rows based on Z-scores above and below the mean since we are using absolute values of the z-scores
+blur_outliers = df[abs(z_scores) > threshold_z]
+
+# Remove any blur outliers detected in for all channels (currently we have concluded DNA and PM channels are best able to detect blurry images)
+blur_outliers = blur_outliers[(blur_outliers['Channel'] == 'DNA') | (blur_outliers['Channel'] == 'PM')]
+
+print(blur_outliers.shape)
+print(blur_outliers['Channel'].value_counts())
+blur_outliers.sort_values(by='ImageQuality_PowerLogLogSlope', ascending=False).head()
+
+
+# In[7]:
+
+
+# Calculate the mean and standard deviation
+mean_value = df["ImageQuality_PowerLogLogSlope"].mean()
+std_dev = df["ImageQuality_PowerLogLogSlope"].std()
+
+# Set the threshold multiplier for above and below the mean
+threshold = 2
+
+# Calculate the threshold values
+threshold_value_above_mean = mean_value + threshold * std_dev
+threshold_value_below_mean = mean_value - threshold * std_dev
+
+# Print the calculated threshold values
+print("Threshold for outliers above the mean:", threshold_value_above_mean)
+print("Threshold for outliers below the mean:", threshold_value_below_mean)
+
+
+# In[8]:
+
+
+sns.set_style('whitegrid')
+sns.kdeplot(data=df[df['Channel'].isin(['DNA', 'PM'])], x='ImageQuality_PowerLogLogSlope', hue='Channel', palette=['b', 'magenta'], fill=True, common_norm=False)
+plt.title(f'DNA and PM channels are best for identifying blur\n for {plate}')
+plt.xlabel('ImageQuality_PowerLogLogSlope')
+plt.ylabel('Density')
+
+plt.axvline(x=-1.2827898535807258, color='k', linestyle='--')
+plt.axvline(x=-2.3840811649380393, color='k', linestyle='--')
+
+plt.tight_layout()
+plt.savefig(pathlib.Path(f"{figure_dir}/{plate}_DNA_PM_blur_density.png"), dpi=500)
+plt.show()
+
+
 # ## Saturation metric
 # 
 # For saturation metrics, we are looking for:
@@ -117,16 +180,16 @@ plt.show()
 # - Smudged images (usually seen in `DNA` channel regardless of stain)
 # - Specifically for the CFReT project, some cells will start clustering where they are overlapping, causing issues during segmentation. Based on the below threshold method, we can see that intensely clustered cells are easily identified in the `PM` channel.
 # 
-# This means that we will only be setting threshold for outliers that are detected from the DNA and PM channels in the CellProfiler IC pipeline.
+# This means that we will only be setting threshold for saturation outliers that are detected from the DNA and PM channels in the CellProfiler IC pipeline.
 
-# In[5]:
+# In[9]:
 
 
 summary_statistics = df["ImageQuality_PercentMaximal"].describe()
 print(summary_statistics)
 
 
-# In[6]:
+# In[10]:
 
 
 # Calculate Z-scores for the column
@@ -136,56 +199,107 @@ z_scores = zscore(df['ImageQuality_PercentMaximal'])
 threshold_z = 2
 
 # Identify outlier rows based on Z-scores greater than as to identify whole images with abnormally high saturated pixels
-outliers = df[abs(z_scores) > threshold_z]
+sat_outliers = df[abs(z_scores) > threshold_z]
 
 # Remove any outliers detected in other channels (currently we have concluded that those other channels don't detect artifacts)
-outliers = outliers[(outliers['Channel'] == 'DNA') | (outliers['Channel'] == 'PM')]
+sat_outliers = sat_outliers[(sat_outliers['Channel'] == 'DNA') | (sat_outliers['Channel'] == 'PM')]
+
+# Append saturation outliers to blur outliers, drop any duplicate FOVs and save outliers for QC report
+outliers = pd.concat([sat_outliers, blur_outliers], ignore_index=True).drop_duplicates()
 
 # Save outliers data frame to view in report
 outliers.to_csv("./qc_results/qc_outliers.csv")
 
-print(outliers.shape)
-print(outliers['Channel'].value_counts())
-outliers.sort_values(by='ImageQuality_PercentMaximal')
+print(sat_outliers.shape)
+print(sat_outliers['Channel'].value_counts())
+sat_outliers.sort_values(by='ImageQuality_PercentMaximal', ascending=True).head()
 
 
-# We will use the lowest value in the calculated outliers to determine the threshold where any if one image in a set has a value higher then the whole image set is skipped during IC.
-# 
-# **We will be using 0.28 as the threshold.**
-
-# In[10]:
+# In[11]:
 
 
-# Reset the default value to 'inlier'
-df['Outlier_Status'] = 'inlier'
+# Calculate the mean and standard deviation
+mean_value = df["ImageQuality_PercentMaximal"].mean()
+std_dev = df["ImageQuality_PercentMaximal"].std()
 
-# Update the 'Outlier_Status' column based on the outliers DataFrame using index
-df.loc[df.index.isin(outliers.index), 'Outlier_Status'] = 'outlier'
+# Set the threshold multiplier for above and below the mean
+threshold = 2
 
-# Create a box plot
+# Calculate the threshold values
+threshold_value_above_mean = mean_value + threshold * std_dev
+
+# Print the calculated threshold values
+print("Threshold for outliers above the mean:", threshold_value_above_mean)
+
+
+# In[12]:
+
+
+# Create a histogram plot
 plt.figure(figsize=(10, 6))
-sns.boxplot(y='Outlier_Status', x='ImageQuality_PercentMaximal', data=df, palette='viridis')
+plt.hist(df['ImageQuality_PercentMaximal'], bins=80, color='skyblue', edgecolor='black', alpha=0.7)
 
-
-# Add mean lines
+# Add mean and threshold lines
 plt.axvline(
     x=df["ImageQuality_PercentMaximal"].mean(),
-    color="r",
-    linestyle="--",
-    label=f'Mean Nuclei Area: {df["ImageQuality_PercentMaximal"].mean():.2f}',
-)
-plt.axvline(
-    x=0.28,
     color="b",
     linestyle="--",
-    label='Threshold of Outliers: 0.28',
+    label=f'Mean Percent Maximal: {df["ImageQuality_PercentMaximal"].mean():.2f}',
+)
+plt.axvline(
+    x=0.26,
+    color="r",
+    linestyle="--",
+    label='Threshold for Outliers: > 0.26',
 )
 
 # Set labels and title
-plt.ylabel('Outlier Status')
+plt.ylabel('Count')
 plt.xlabel('Percent Maximal')
-plt.title('Box Plot of Percent Maximal by Outlier Status')
+plt.title(f'Histogram plot of percent maximal for {plate}')
 plt.legend()
+plt.tight_layout()
+
+plt.savefig(pathlib.Path(f"{figure_dir}/{plate}_percent_maximal.png"), dpi=500)
+
+# Show the plot
+plt.show()
+
+
+# ### Zoomed-in plot
+
+# In[13]:
+
+
+# Create a histogram plot
+plt.figure(figsize=(10, 6))
+plt.hist(df['ImageQuality_PercentMaximal'], bins=50, color='skyblue', edgecolor='black', alpha=0.7)
+
+# Add mean and threshold lines
+plt.axvline(
+    x=df["ImageQuality_PercentMaximal"].mean(),
+    color="b",
+    linestyle="--",
+    label=f'Mean Percent Maximal: {df["ImageQuality_PercentMaximal"].mean():.2f}',
+)
+plt.axvline(
+    x=0.26,
+    color="r",
+    linestyle="--",
+    label='Threshold for Outliers: > 0.26',
+)
+
+# Set labels
+plt.ylabel('Count')
+plt.xlabel('Percent Maximal')
+
+# Set the zoomed-in axis ranges
+plt.xlim(0, 1)
+plt.ylim(0, 100)
+
+plt.tight_layout()
+
+plt.savefig(pathlib.Path(f"{figure_dir}/{plate}_percent_maximal_zoomed.png"), dpi=500)
 
 # Show the plot
 plt.show()
