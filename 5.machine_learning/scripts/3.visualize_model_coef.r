@@ -25,7 +25,7 @@ healthy_coef_file <- file.path(input_data_dir, "healthy_coeffs.csv")
 failing_coef_file <- file.path(input_data_dir, "failing_coeffs.csv")
 
 # Paths for each figure output
-all_coef_fig <- file.path(output_fig_dir, "logistic_regression_final_all_coefficients_plot.pdf")
+all_coef_fig <- file.path(output_fig_dir, "logistic_regression_final_all_coefficients_plot.png")
 ranked_coef_fig <- file.path(output_fig_dir, "logistic_regression_final_ranked_coefficients_line_plot.png")
 healthy_coef_fig <- file.path(output_fig_dir, "logistic_regression_final_healthy_coefficients_plot.png")
 failing_coef_fig <- file.path(output_fig_dir, "logistic_regression_final_failing_coefficients_plot.png")
@@ -362,7 +362,7 @@ ggsave(ranked_coef_fig, coef_rank_plot, height = 8, width = 12, dpi = 500)
 
 # Add zoomed in portions
 # Top features from healthy (positive)
-from <- list(-15, 40, 0.25, 0.58) #xmin, xmax, ymin, ymax
+from <- list(-15, 40, 0.35, 0.68) #xmin, xmax, ymin, ymax
 to <- list(125, 275, 0.4, 1.4)
 coef_rank_plot <- coef_rank_plot + geom_magnify(
     from = from, to = to
@@ -375,7 +375,7 @@ coef_rank_plot <- coef_rank_plot + geom_magnify(
 )
 
 # Create a new save path with "_zoom" added to save the added zoomed in portions
-ranked_coef_fig_zoom <- gsub(".png$", "_zoom.pdf", ranked_coef_fig)
+ranked_coef_fig_zoom <- gsub(".png$", "_zoom.png", ranked_coef_fig)
 
 # Save figure after adding zooms
 ggsave(ranked_coef_fig_zoom, coef_rank_plot, height = 8, width = 12, dpi = 500)

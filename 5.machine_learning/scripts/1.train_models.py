@@ -168,6 +168,9 @@ else:
             # Perform the random hyperparameter search
             final_random_search.fit(X_train, y_train)
 
+# Print the best parameters
+print("Optimal parameters:", final_random_search.best_params_)
+
 
 # ### Train shuffled baseline model
 
@@ -220,5 +223,5 @@ else:
     # Save label encoder
     dump(le, f"{encoder_dir}/label_encoder_{data_prefix}.joblib")
 
-    print("Models and label encoder have been saved!")
+print("Models and label encoder have been saved!")
 

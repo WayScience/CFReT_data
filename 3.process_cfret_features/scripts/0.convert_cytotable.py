@@ -61,67 +61,63 @@ for name in plate_names:
 
 
 for file_path in sqlite_dir.iterdir():
-    # Focus only on plates with "KK22-05-198" in the name
-    if "KK22-05-198" in file_path.stem:
-        output_path = pathlib.Path(
-            f"{output_dir}/converted_profiles/{file_path.stem}_converted.parquet"
-        )
-        print("Starting conversion with cytotable for plate:", file_path.stem)
-        # Merge single cells and output as parquet file
-        convert(
-            source_path=str(file_path),
-            dest_path=str(output_path),
-            dest_datatype=dest_datatype,
-            preset=preset,
-            joins=joins,
-            chunk_size=5000,
-        )
+    output_path = pathlib.Path(
+        f"{output_dir}/converted_profiles/{file_path.stem}_converted.parquet"
+    )
+    print("Starting conversion with cytotable for plate:", file_path.stem)
+    # Merge single cells and output as parquet file
+    convert(
+        source_path=str(file_path),
+        dest_path=str(output_path),
+        dest_datatype=dest_datatype,
+        preset=preset,
+        joins=joins,
+        chunk_size=5000,
+    )
 
-print("All plates with 'KK22-05-198' in the name have been converted with cytotable!")
+print("All plates have been converted with cytotable!")
 
 
 # # Load in converted profiles to update
 
-# In[6]:
+# In[4]:
 
 
 # Directory with converted profiles
 converted_dir = pathlib.Path(f"{output_dir}/converted_profiles")
 
 for file_path in converted_dir.iterdir():
-    # Focus only on plates with "KK22-05-198" in the name
-    if "KK22-05-198" in file_path.stem:
-        # Load the DataFrame from the Parquet file
-        df = pd.read_parquet(file_path)
+    # Load the DataFrame from the Parquet file
+    df = pd.read_parquet(file_path)
 
-        # If any, drop rows where "Metadata_ImageNumber" is NaN (artifact of cytotable)
-        df = df.dropna(subset=["Metadata_ImageNumber"])
+    # If any, drop rows where "Metadata_ImageNumber" is NaN (artifact of cytotable)
+    df = df.dropna(subset=["Metadata_ImageNumber"])
 
-        # Columns to move to the front
-        columns_to_move = [
-            "Nuclei_Location_Center_X",
-            "Nuclei_Location_Center_Y",
-            "Cells_Location_Center_X",
-            "Cells_Location_Center_Y",
-            "Image_Count_Cells",
-        ]
+    # Columns to move to the front
+    columns_to_move = [
+        "Nuclei_Location_Center_X",
+        "Nuclei_Location_Center_Y",
+        "Cells_Location_Center_X",
+        "Cells_Location_Center_Y",
+        "Image_Count_Cells",
+    ]
 
-        # Rearrange columns and add "Metadata" prefix in one line
-        df = df[
-            columns_to_move + [col for col in df.columns if col not in columns_to_move]
-        ].rename(
-            columns=lambda col: "Metadata_" + col if col in columns_to_move else col
-        )
+    # Rearrange columns and add "Metadata" prefix in one line
+    df = df[
+        columns_to_move + [col for col in df.columns if col not in columns_to_move]
+    ].rename(
+        columns=lambda col: "Metadata_" + col if col in columns_to_move else col
+    )
 
-        # Save the processed DataFrame as Parquet in the same path
-        df.to_parquet(file_path, index=False)
+    # Save the processed DataFrame as Parquet in the same path
+    df.to_parquet(file_path, index=False)
 
 
 # ## Check output to confirm process worked
 # 
 # To confirm the number of single cells is correct, please use any database browser software to see if the number of rows in the "Per_Cells" compartment matches the number of rows in the data frame.
 
-# In[7]:
+# In[5]:
 
 
 converted_df = pd.read_parquet(

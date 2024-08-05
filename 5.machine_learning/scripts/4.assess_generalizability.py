@@ -261,7 +261,7 @@ plt.xticks(fontsize=14)
 plt.yticks(fontsize=14)
 
 plt.tight_layout()
-plt.savefig(f"{fig_dir}/precision_recall_plate3_DMSO_only.pdf", dpi=500)
+plt.savefig(f"{fig_dir}/precision_recall_plate3_DMSO_only.png", dpi=500)
 
 plt.show()
 

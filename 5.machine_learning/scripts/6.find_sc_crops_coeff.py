@@ -3,29 +3,29 @@
 
 # # Find one top representative single-cell crop visualize per top healthy and failing coefficients
 # 
-# The features with the highest coefficients per channel per cell type per identified *manually*. We do not use correlation features due to having to use two features and those are harder to visualize.
+# The features with the highest coefficients per channel per cell type are identified *manually*. We do not use correlation features due to having to use two features and those are harder to visualize.
 # 
 # We first filter the plate 4 data frame to only include isolated cells (0 cell neighbors adjacent) and then filter out any single-cell that is too close to an edge (based on crop_size).
 # 
 # ### **Top healthy features per channel**
 # 
-# | Feature | Coefficient |
-# |-----------------|-----------------|
-# | Nuclei_Intensity_MeanIntensityEdge_**Hoechst** | 1.6491632293619 |
-# | Cytoplasm_Texture_AngularSecondMoment_**ER**_3_01_256 | 0.251023308427374 |
-# | Nuclei_Intensity_IntegratedIntensity_**PM** | 0.647266129401344 |
-# | Nuclei_RadialDistribution_MeanFrac_**Mitochondria**_3of4 | 0.338620308838192 |
-# | Nuclei_Intensity_MinIntensity_**Actin** | 0.34104254666359 |
+# | Organelle | Feature | Coefficient |
+# |-----------------|-----------------|-----------------|
+# | Nucleus | Nuclei_Intensity_MeanIntensityEdge_Hoechst | 1.41883228668943 |
+# | ER | Nuclei_Texture_AngularSecondMoment_ER_3_01_256 | 0.247086864563417 |
+# | Golgi/Plasma membrane | Nuclei_Intensity_IntegratedIntensity_PM | 0.551412935417769 |
+# | Mitochondria | Cells_Intensity_MinIntensityEdge_Mitochondria | 0.247078061220504 |
+# | F-actin | Nuclei_Intensity_MinIntensity_Actin | 0.623372719535748 |
 # 
 # ### **Top failing features per channel**
 # 
-# | Feature | Coefficient |
-# |-----------------|-----------------|
-# | Nuclei_Intensity_StdIntensityEdge_**Hoechst** | 0.731721019099269 |
-# | Cells_Intensity_IntegratedIntensityEdge_**ER** | 0.260370773712069 |
-# | Cells_Texture_InfoMeas1_**PM**_3_00_256 | 0.277759767032262 |
-# | Nuclei_Intensity_LowerQuartileIntensity_**Mitochondria** | 0.280095597808861 |
-# | Cells_Intensity_IntegratedIntensityEdge_**Actin** | 1.1894472062255 |
+# | Organelle | Feature | Coefficient |
+# |-----------------|-----------------|-----------------|
+# | Nucleus | Cells_Intensity_StdIntensityEdge_Hoechst | 0.736873911951805 |
+# | ER | Cytoplasm_Texture_InverseDifferenceMoment_ER_3_01_256 | 0.357607115585286 |
+# | Golgi/Plasma membrane | Cytoplasm_Texture_InfoMeas1_PM_3_00_256 | 0.518741372506253 |
+# | Mitochondria | Nuclei_Intensity_IntegratedIntensity_Mitochondria | 0.26804586648328 |
+# | F-actin | Cells_Intensity_IntegratedIntensityEdge_Actin | 1.35720412209369 |
 # 
 
 # In[1]:
@@ -241,12 +241,12 @@ top_healthy_nuclei
 # In[8]:
 
 
-# Get data frame with the top single-cell from the top healthy nuclei coefficient
+# Get data frame with the top single-cell from the top healthy ER coefficient
 top_healthy_ER = filtered_plate4_df[filtered_plate4_df["Metadata_cell_type"] == "Healthy"].nlargest(
-    1, "Cytoplasm_Texture_AngularSecondMoment_ER_3_01_256"
+    1, "Nuclei_Texture_AngularSecondMoment_ER_3_01_256"
 )[
     [
-        "Cytoplasm_Texture_AngularSecondMoment_ER_3_01_256",
+        "Nuclei_Texture_AngularSecondMoment_ER_3_01_256",
         "Metadata_cell_type",
         "Metadata_Well",
         "Metadata_Plate",
@@ -268,7 +268,7 @@ top_healthy_ER
 # In[9]:
 
 
-# Get data frame with the top single-cell from the top healthy nuclei coefficient
+# Get data frame with the top single-cell from the top healthy PM coefficient
 top_healthy_PM = filtered_plate4_df[filtered_plate4_df["Metadata_cell_type"] == "Healthy"].nlargest(
     1, "Nuclei_Intensity_IntegratedIntensity_PM"
 )[
@@ -295,12 +295,12 @@ top_healthy_PM
 # In[10]:
 
 
-# Get data frame with the top single-cell from the top healthy nuclei coefficient
+# Get data frame with the top single-cell from the top healthy Mitochondria coefficient
 top_healthy_mito = filtered_plate4_df[filtered_plate4_df["Metadata_cell_type"] == "Healthy"].nlargest(
-    1, "Nuclei_RadialDistribution_MeanFrac_Mitochondria_3of4"
+    1, "Cells_Intensity_MinIntensityEdge_Mitochondria"
 )[
     [
-        "Nuclei_RadialDistribution_MeanFrac_Mitochondria_3of4",
+        "Cells_Intensity_MinIntensityEdge_Mitochondria",
         "Metadata_cell_type",
         "Metadata_Well",
         "Metadata_Plate",
@@ -322,7 +322,7 @@ top_healthy_mito
 # In[11]:
 
 
-# Get data frame with the top single-cell from the top healthy nuclei coefficient
+# Get data frame with the top single-cell from the top healthy Actin coefficient
 top_healthy_actin = filtered_plate4_df[filtered_plate4_df["Metadata_cell_type"] == "Healthy"].nlargest(
     1, "Nuclei_Intensity_MinIntensity_Actin"
 )[
@@ -351,12 +351,12 @@ top_healthy_actin
 # In[12]:
 
 
-# Get data frame with the top single-cell from the top healthy nuclei coefficient
+# Get data frame with the top single-cell from the top failing nuclei coefficient
 top_failing_nuclei = filtered_plate4_df[filtered_plate4_df["Metadata_cell_type"] == "Failing"].nlargest(
-    1, "Nuclei_Intensity_StdIntensityEdge_Hoechst"
+    1, "Cells_Intensity_StdIntensityEdge_Hoechst"
 )[
     [
-        "Nuclei_Intensity_StdIntensityEdge_Hoechst",
+        "Cells_Intensity_StdIntensityEdge_Hoechst",
         "Metadata_cell_type",
         "Metadata_Well",
         "Metadata_Plate",
@@ -378,12 +378,12 @@ top_failing_nuclei
 # In[13]:
 
 
-# Get data frame with the top single-cell from the top healthy nuclei coefficient
+# Get data frame with the top single-cell from the top failing ER coefficient
 top_failing_ER = filtered_plate4_df[filtered_plate4_df["Metadata_cell_type"] == "Failing"].nlargest(
-    1, "Cells_Intensity_IntegratedIntensityEdge_ER"
+    1, "Cytoplasm_Texture_InverseDifferenceMoment_ER_3_01_256"
 )[
     [
-        "Cells_Intensity_IntegratedIntensityEdge_ER",
+        "Cytoplasm_Texture_InverseDifferenceMoment_ER_3_01_256",
         "Metadata_cell_type",
         "Metadata_Well",
         "Metadata_Plate",
@@ -405,12 +405,12 @@ top_failing_ER
 # In[14]:
 
 
-# Get data frame with the top single-cell from the top healthy nuclei coefficient
+# Get data frame with the top single-cell from the top failing PM coefficient
 top_failing_PM = filtered_plate4_df[filtered_plate4_df["Metadata_cell_type"] == "Failing"].nlargest(
-    1, "Cells_Texture_InfoMeas1_PM_3_00_256"
+    1, "Cytoplasm_Texture_InfoMeas1_PM_3_00_256"
 )[
     [
-        "Cells_Texture_InfoMeas1_PM_3_00_256",
+        "Cytoplasm_Texture_InfoMeas1_PM_3_00_256",
         "Metadata_cell_type",
         "Metadata_Well",
         "Metadata_Plate",
@@ -432,12 +432,12 @@ top_failing_PM
 # In[15]:
 
 
-# Get data frame with the top single-cell from the top healthy nuclei coefficient
+# Get data frame with the top single-cell from the top failing Mitochondria coefficient
 top_failing_mito = filtered_plate4_df[filtered_plate4_df["Metadata_cell_type"] == "Failing"].nlargest(
-    1, "Nuclei_Intensity_LowerQuartileIntensity_Mitochondria"
+    1, "Nuclei_Intensity_IntegratedIntensity_Mitochondria"
 )[
     [
-        "Nuclei_Intensity_LowerQuartileIntensity_Mitochondria",
+        "Nuclei_Intensity_IntegratedIntensity_Mitochondria",
         "Metadata_cell_type",
         "Metadata_Well",
         "Metadata_Plate",
@@ -459,7 +459,7 @@ top_failing_mito
 # In[16]:
 
 
-# Get data frame with the top single-cell from the top healthy nuclei coefficient
+# Get data frame with the top single-cell from the top failing Actin coefficient
 top_failing_actin = filtered_plate4_df[filtered_plate4_df["Metadata_cell_type"] == "Failing"].nlargest(
     1, "Cells_Intensity_IntegratedIntensityEdge_Actin"
 )[

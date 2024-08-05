@@ -199,7 +199,7 @@ merged_plot <- ggplot(combined_df, aes(x = UMAP0, y = UMAP1, color = Group)) +
   guides(colour = guide_legend(override.aes = list(size = 4))) +
   ylim(min(umap_cp_df$UMAP1), max(umap_cp_df$UMAP1)) +  # Set the same y-axis limits as umap_cp_df
   theme(
-    legend.position = c(0.85, 0.13),  # Adjust the legend position (x, y)
+    legend.position = c(0.15, 0.88),  # Adjust the legend position (x, y)
     legend.background = element_rect(fill = "white", color = "black"),  # Add a white background to the legend
     legend.key = element_rect(color = "white"),  # Make legend key (color boxes) white
 
@@ -238,7 +238,7 @@ merged_TGFRi_plot <- ggplot(combined_df, aes(x = UMAP0, y = UMAP1, color = Group
   guides(colour = guide_legend(override.aes = list(size = 4))) +
   ylim(min(umap_cp_df$UMAP1), max(umap_cp_df$UMAP1)) +  # Set the same y-axis limits as umap_cp_df
   theme(
-    legend.position = c(0.85, 0.13),  # Adjust the legend position (x, y)
+    legend.position = c(0.15, 0.88),  # Adjust the legend position (x, y)
     legend.background = element_rect(fill = "white", color = "black"),  # Add a white background to the legend
     legend.key = element_rect(color = "white"),  # Make legend key (color boxes) white
 
@@ -270,7 +270,7 @@ merged_plot <- ggplot(combined_df, aes(x = UMAP0, y = UMAP1, color = Group)) +
   guides(colour = guide_legend(override.aes = list(size = 4))) +
   ylim(min(umap_cp_df$UMAP1), max(umap_cp_df$UMAP1)) +  # Set the same y-axis limits as umap_cp_df
   theme(
-    legend.position = c(0.85, 0.13),  # Adjust the legend position (x, y)
+    legend.position = c(0.15, 0.88),  # Adjust the legend position (x, y)
     legend.background = element_rect(fill = "white", color = "black"),  # Add a white background to the legend
     legend.key = element_rect(color = "white"),  # Make legend key (color boxes) white
 
@@ -314,7 +314,7 @@ values = c("failing + drug_x" = "#69DC9E", "failing + DMSO" = "#BA5A31", "health
 guides(colour = guide_legend(override.aes = list(size = 4))) +
 ylim(min(umap_cp_df$UMAP1), max(umap_cp_df$UMAP1)) +
 theme(
-legend.position = c(0.86, 0.15),
+legend.position = c(0.15, 0.88),  # Adjust the legend position (x, y)
 legend.background = element_rect(fill = "white", color = "black"),
 legend.key = element_rect(color = "white")
 )

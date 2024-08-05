@@ -22,7 +22,7 @@ from pycytominer import annotate, normalize, feature_select
 
 
 # Path to dir with cleaned data from single-cell QC
-converted_dir = pathlib.Path("./data/cleaned_profiles") # currently for only plates 3 and 4
+converted_dir = pathlib.Path("./data/cleaned_profiles")
 
 # output path for single-cell profiles 
 output_dir = pathlib.Path("./data/single_cell_profiles")
@@ -62,7 +62,7 @@ plate_info_dictionary = {
             )
         ),
     }
-    for name in plate_names if 'KK22-05-198' in name # only plates 1 and 2
+    for name in plate_names
 }
 
 # view the dictionary to assess that all info is added correctly

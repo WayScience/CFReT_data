@@ -4,11 +4,12 @@ suppressPackageStartupMessages(library(dplyr))
 # Set directory and file structure
 umap_dir <- file.path("results")
 umap_files <- list.files(umap_dir, full.names = TRUE)
+umap_files <- grep("KK22-05-198", umap_files, value = TRUE)
 print(umap_files)
 
 output_fig_dir <- file.path("figures")
 umap_prefix <- "UMAP_"
-plate_suffix <- "_sc_norm_fs_cellprofiler.csv.gz.tsv.gz"
+plate_suffix <- "_sc_feature_selected.tsv.gz"
 
 # Define output figure paths
 output_umap_files <- list()
@@ -31,6 +32,8 @@ for (umap_file in umap_files) {
         
 print(output_umap_files)
 
+plate
+
 # Load data
 umap_cp_df <- list()
 for (plate in names(output_umap_files)) {
@@ -46,10 +49,12 @@ for (plate in names(output_umap_files)) {
             "Metadata_WellCol" = "c",
             "Metadata_heart_number" = "c",
             "Metadata_treatment" = "c",
-            "Metadata_dose" = "c",
+            "Metadata_dose" = "d",
+            "Metadata_dose_unit" = "c",
             "Metadata_ImageNumber" = "c",
             "Metadata_Plate" = "c",
             "Metadata_Well" = "c",
+            "Metadata_Site" = "c",
             "Metadata_Cytoplasm_Parent_Cells" = "c",
             "Metadata_Cytoplasm_Parent_Nuclei" = "c",
             "Metadata_Cells_Number_Object_Number" = "c",
@@ -71,25 +76,25 @@ for (plate in names(umap_cp_df)) {
     # Pull the associated dataframe
     df <- umap_cp_df[[plate]]
     
-    # Extract dose order and sort, then recompile
+    # Ensure doses are numeric and add dose unit
+    numeric_doses <- as.numeric(df$Metadata_dose)
+    
+    # Append the dose unit
+    df$Metadata_dose <- paste0(numeric_doses, dose_unit)
+    
+    # Extract unique dose order and sort, then recompile
     dose_order <- paste0(
-        sort(
-            as.numeric(
-                stringr::str_remove(
-                    names(
-                        table(df$Metadata_dose)
-                    ),
-                    dose_unit
-                )
-            )
-        ),
+        sort(unique(numeric_doses), na.last = TRUE),
         dose_unit
     )
-
+    
     # Perform the factor ordering
-    umap_cp_df[[plate]]$Metadata_dose <- 
-        factor(df$Metadata_dose, levels = dose_order)
-    }
+    df$Metadata_dose <- factor(df$Metadata_dose, levels = dose_order)
+    
+    # Update the original dataframe in the list
+    umap_cp_df[[plate]] <- df
+}
+
 
 for (plate in names(umap_cp_df)) {
     # Treatment UMAP

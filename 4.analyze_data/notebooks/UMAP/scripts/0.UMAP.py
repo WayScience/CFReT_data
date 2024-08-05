@@ -62,9 +62,15 @@ print(cp_dfs.keys())
 [cp_dfs[x].shape for x in cp_dfs]
 
 
+# In[5]:
+
+
+cp_dfs
+
+
 # ### Fit UMAP for whole plates
 
-# In[5]:
+# In[6]:
 
 
 # Fit UMAP features per dataset and save
@@ -121,7 +127,7 @@ for plate in cp_dfs:
 # 
 # Note: We are filtering out single-cells from plates 3 and 4 where there is more than 1 single-cell adjacent. We are looking to see the impact on the UMAP when only including "isolated" single-cells.
 
-# In[6]:
+# In[7]:
 
 
 # Set random seed as 0 for filtered datasets
@@ -141,7 +147,7 @@ for file_path in pathlib.Path("../../../0.download_data/Images").iterdir():
 print(plate_names)
 
 
-# In[7]:
+# In[8]:
 
 
 # create plate info dictionary
@@ -174,7 +180,7 @@ print(
 )
 
 
-# In[8]:
+# In[9]:
 
 
 for plate, info in plate_info_dictionary.items():

@@ -61,7 +61,7 @@ ridge_plot_healthy <- ggplot(combined_probabilities_df, aes(x = Healthy_probas, 
   
 
 # Save figure
-ggsave("./figures/healthy_prob_ridge_plot_plate_3.pdf", ridge_plot_healthy, height = 8, width = 12, dpi = 500)
+ggsave("./figures/healthy_prob_ridge_plot_plate_3.png", ridge_plot_healthy, height = 8, width = 12, dpi = 500)
 
 ridge_plot_healthy
 

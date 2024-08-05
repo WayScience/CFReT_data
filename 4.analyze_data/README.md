@@ -53,17 +53,3 @@ One notebook is meant for plate 3 data and the other is for plate 4 data.
 ## Histogram plot
 
 In this folder, there is only one notebook that is used to load in the annotated data frame from plate 4, and then create a histogram plot with all heart number distributions on it to compare.
-
-## Create environments
-
-In this module, there are two different environments to create to use in the notebooks. 
-
-- [python_analysis_env](./python_analysis_env.yml): This environment is for use in python specific notebooks.
-- [R_analysis_env](./R_analysis_env.yml): This environment is for use in R specific notebooks.
-
-You can create the environments using the code block below:
-
-```bash
-# create environment for analysis
-mamba env create -f python_analysis_env.yml
-```

@@ -65,6 +65,6 @@ accuracy_plot_gg <- ggplot(final_df, aes(x = factor(Heart_Number), y = Accuracy,
   )
 
 # Save the plot as an image file using the options set for plot width and height
-ggsave("./figures/accuracy_plot_plate_4_per_heart_downsample.png", plot = accuracy_plot_gg, width = getOption("repr.plot.width"), height = getOption("repr.plot.height"), dpi = 300)
+ggsave("./figures/accuracy_plot_plate_4_per_heart_downsample.pdf", plot = accuracy_plot_gg, width = getOption("repr.plot.width"), height = getOption("repr.plot.height"), dpi = 300)
 
 accuracy_plot_gg
